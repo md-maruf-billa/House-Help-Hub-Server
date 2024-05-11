@@ -1,6 +1,6 @@
 import express from 'express';
 const app = express();
-import { MongoClient,ObjectId,ServerApiVersion } from 'mongodb';
+import { MongoClient, ObjectId, ServerApiVersion } from 'mongodb';
 import cors from 'cors';
 import 'dotenv/config'
 const port = process.env.PORT || 7000;
@@ -25,41 +25,57 @@ async function run() {
         const allServicesCollection = client.db("HouseHelpHub").collection("allServices");
         const allBookingsCollection = client.db("HouseHelpHub").collection("allBookings")
         //------------------POST DATA FROM CLIENT SIDE----------------
-        app.post("/add-service", async(req,res)=>{
+        app.post("/add-service", async (req, res) => {
             const userData = req.body;
             const result = await allServicesCollection.insertOne(userData);
             res.send(result)
         })
 
         //-------------GET BOOKING DATA FORM CLIENT SIDE AND SEND WITH DATABASE
-        app.post("/post-booking" , async(req,res)=>{
+        app.post("/post-booking", async (req, res) => {
             const data = req.body;
             const result = await allBookingsCollection.insertOne(data);
             res.send(result);
         })
-
+        //--------------UPDATE SERVICE ------------------
+        app.put("/update-service/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = {_id: new ObjectId(id)};
+            const data = req.body;
+            const updateData = {
+                $set: {
+                    photoURL: data.photoURL,
+                    serviceName: data.serviceName,
+                    price: data.price,
+                    serviceArea: data.serviceArea,
+                    description: data.description
+                }
+            }
+            const result = await allServicesCollection.updateOne(query,updateData);
+            res.send(result)
+        })
         //-----------Get All Services From database----------
-        app.get("/all-services", async(req,res)=>{
+        app.get("/all-services", async (req, res) => {
             const result = await allServicesCollection.find().toArray();
             res.send(result);
         })
 
         //--------------Get data by id--------------
-        app.get("/service/:id" , async(req,res)=>{
+        app.get("/service/:id", async (req, res) => {
             const id = req.params.id;
-            const query = {_id : new ObjectId(id)};
+            const query = { _id: new ObjectId(id) };
             const result = await allServicesCollection.findOne(query);
             res.send(result)
         })
         //--------------Get data by user email----------------
-        app.get("/current-user-services", async(req,res)=>{
+        app.get("/current-user-services", async (req, res) => {
             const query = req.query;
             const result = await allServicesCollection.find(query).toArray();
             res.send(result);
         })
 
         //-------------------TEST FOR SERVER-----------
-        app.get("/",async(req,res)=>{
+        app.get("/", async (req, res) => {
             res.send("House Help Server Is Running...!!!!")
         })
 
