@@ -51,7 +51,12 @@ async function run() {
             const result = await allServicesCollection.findOne(query);
             res.send(result)
         })
-
+        //--------------Get data by user email----------------
+        app.get("/current-user-services", async(req,res)=>{
+            const query = req.query;
+            const result = await allServicesCollection.find(query).toArray();
+            res.send(result);
+        })
 
         //-------------------TEST FOR SERVER-----------
         app.get("/",async(req,res)=>{
