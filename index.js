@@ -22,12 +22,20 @@ const client = new MongoClient(uri, {
 
 async function run() {
     try {
-        const allServicesCollection = client.db("HouseHelpHub").collection("allServices")
+        const allServicesCollection = client.db("HouseHelpHub").collection("allServices");
+        const allBookingsCollection = client.db("HouseHelpHub").collection("allBookings")
         //------------------POST DATA FROM CLIENT SIDE----------------
         app.post("/add-service", async(req,res)=>{
             const userData = req.body;
             const result = await allServicesCollection.insertOne(userData);
             res.send(result)
+        })
+
+        //-------------GET BOOKING DATA FORM CLIENT SIDE AND SEND WITH DATABASE
+        app.post("/post-booking" , async(req,res)=>{
+            const data = req.body;
+            const result = await allBookingsCollection.insertOne(data);
+            res.send(result);
         })
 
         //-----------Get All Services From database----------
