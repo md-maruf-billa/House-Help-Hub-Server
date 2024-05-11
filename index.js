@@ -40,7 +40,7 @@ async function run() {
         //--------------UPDATE SERVICE ------------------
         app.put("/update-service/:id", async (req, res) => {
             const id = req.params.id;
-            const query = {_id: new ObjectId(id)};
+            const query = { _id: new ObjectId(id) };
             const data = req.body;
             const updateData = {
                 $set: {
@@ -51,9 +51,19 @@ async function run() {
                     description: data.description
                 }
             }
-            const result = await allServicesCollection.updateOne(query,updateData);
+            const result = await allServicesCollection.updateOne(query, updateData);
             res.send(result)
         })
+
+
+        //-----------DELETE A SERVICE FROM CLIENT SIDE TO DATABASE-------------
+        app.delete("/delete-service", async (req, res) => {
+            const id = req.query._id;
+            const query = {_id:new ObjectId(id)}
+            const result = await allServicesCollection.deleteOne(query);
+            res.send(result)
+        })
+
         //-----------Get All Services From database----------
         app.get("/all-services", async (req, res) => {
             const result = await allServicesCollection.find().toArray();
