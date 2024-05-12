@@ -55,7 +55,19 @@ async function run() {
             res.send(result)
         })
 
-
+        //----------------UPDATE BOOKING STATUS-------------------------
+        app.put("/update-booking/:id", async(req,res)=>{
+            const id = req.params.id;
+            const status = req.body;
+            const query = {_id:new ObjectId(id)}
+            const updateStatus ={
+                $set:{
+                    status:status.currentStatus
+                }
+            }
+            const result = await allBookingsCollection.updateOne(query,updateStatus);
+            res.send(result)
+        })
         //-----------DELETE A SERVICE FROM CLIENT SIDE TO DATABASE-------------
         app.delete("/delete-service", async (req, res) => {
             const id = req.query._id;
