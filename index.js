@@ -64,6 +64,14 @@ async function run() {
             res.send(result)
         })
 
+        //------------------DELETE A BOOKING---------------------
+        app.delete("/delete-booking", async(req,res)=>{
+            const id = req.query._id;
+            const query = {_id:new ObjectId(id)};
+            const result = await allBookingsCollection.deleteOne(query);
+            res.send(result)
+        })
+
         //-----------Get All Services From database----------
         app.get("/all-services", async (req, res) => {
             const result = await allServicesCollection.find().toArray();
@@ -82,6 +90,14 @@ async function run() {
             const query = req.query;
             const result = await allServicesCollection.find(query).toArray();
             res.send(result);
+        })
+
+        //----------------GET BOOKING DATA USING EMAIL--------------
+        app.get("/booking-services" , async(req,res)=>{
+            const customerEmail = req.query;
+            const result = await allBookingsCollection.find(customerEmail).toArray();
+            res.send(result);
+            
         })
 
         //-------------------TEST FOR SERVER-----------
