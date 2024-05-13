@@ -55,31 +55,51 @@ async function run() {
             res.send(result)
         })
 
+        //-------------------handel search service---------------
+        app.get("/search/:search", async (req, res) => {
+            const queryData = req.params.search;
+            if(queryData==""){
+                res.send([]);
+                return;
+            }
+            const result = await allServicesCollection.find(
+                {
+                    "$or": [
+                        { "serviceName": { $regex: queryData, $options: "i" } },
+                        { "serviceArea": { $regex: queryData, $options: "i" } },
+                        { "providerName": { $regex: queryData, $options: "i" } }
+                    ]
+
+                }
+            ).toArray();
+            res.send(result)
+        })
+
         //----------------UPDATE BOOKING STATUS-------------------------
-        app.put("/update-booking/:id", async(req,res)=>{
+        app.put("/update-booking/:id", async (req, res) => {
             const id = req.params.id;
             const status = req.body;
-            const query = {_id:new ObjectId(id)}
-            const updateStatus ={
-                $set:{
-                    status:status.currentStatus
+            const query = { _id: new ObjectId(id) }
+            const updateStatus = {
+                $set: {
+                    status: status.currentStatus
                 }
             }
-            const result = await allBookingsCollection.updateOne(query,updateStatus);
+            const result = await allBookingsCollection.updateOne(query, updateStatus);
             res.send(result)
         })
         //-----------DELETE A SERVICE FROM CLIENT SIDE TO DATABASE-------------
         app.delete("/delete-service", async (req, res) => {
             const id = req.query._id;
-            const query = {_id:new ObjectId(id)}
+            const query = { _id: new ObjectId(id) }
             const result = await allServicesCollection.deleteOne(query);
             res.send(result)
         })
 
         //------------------DELETE A BOOKING---------------------
-        app.delete("/delete-booking", async(req,res)=>{
+        app.delete("/delete-booking", async (req, res) => {
             const id = req.query._id;
-            const query = {_id:new ObjectId(id)};
+            const query = { _id: new ObjectId(id) };
             const result = await allBookingsCollection.deleteOne(query);
             res.send(result)
         })
@@ -105,11 +125,11 @@ async function run() {
         })
 
         //----------------GET BOOKING DATA USING EMAIL--------------
-        app.get("/booking-services" , async(req,res)=>{
+        app.get("/booking-services", async (req, res) => {
             const customerEmail = req.query;
             const result = await allBookingsCollection.find(customerEmail).toArray();
             res.send(result);
-            
+
         })
 
         //-------------------TEST FOR SERVER-----------
