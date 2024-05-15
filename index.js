@@ -106,7 +106,13 @@ async function run() {
 
         //-----------Get All Services From database----------
         app.get("/all-services", async (req, res) => {
-            const result = await allServicesCollection.find().toArray();
+            const size =parseInt( req.query.size);
+            const page = parseInt(req.query.page);
+            console.log(size,page)
+            const result = await allServicesCollection.find()
+            .skip(page*size)
+            .limit(size)
+            .toArray();
             res.send(result);
         })
 
