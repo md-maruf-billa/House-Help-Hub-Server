@@ -3,6 +3,8 @@ const app = express();
 import { MongoClient, ObjectId, ServerApiVersion } from 'mongodb';
 import cors from 'cors';
 import 'dotenv/config'
+import stripe from "stripe";
+const stripeInit = stripe(process.env.STRIPE_API_KEY)
 const port = process.env.PORT || 7000;
 
 //-----------MIDDLEWARE-----------------
@@ -24,6 +26,19 @@ async function run() {
     try {
         const allServicesCollection = client.db("HouseHelpHub").collection("allServices");
         const allBookingsCollection = client.db("HouseHelpHub").collection("allBookings")
+
+
+        //-------------------STRIPE HARE---------------------
+        app.post("/check-payment-info", async (req, res) => {
+            const { price } = req.body;
+            const totalPrice = parseInt(price * 100);
+            const paymentIntent = await stripeInit.paymentIntents.create({
+                amount: totalPrice,
+                currency: 'usd',
+            })
+            res.send({ clientSecret: paymentIntent.client_secret })
+
+        })
         //------------------POST DATA FROM CLIENT SIDE----------------
         app.post("/add-service", async (req, res) => {
             const userData = req.body;
@@ -58,7 +73,7 @@ async function run() {
         //-------------------handel search service---------------
         app.get("/search/:search", async (req, res) => {
             const queryData = req.params.search;
-            if(queryData==""){
+            if (queryData == "") {
                 res.send([]);
                 return;
             }
@@ -106,13 +121,13 @@ async function run() {
 
         //-----------Get All Services From database----------
         app.get("/all-services", async (req, res) => {
-            const size =parseInt( req.query.size);
+            const size = parseInt(req.query.size);
             const page = parseInt(req.query.page);
-            console.log(size,page)
+            // console.log(size, page)
             const result = await allServicesCollection.find()
-            .skip(page*size)
-            .limit(size)
-            .toArray();
+                .skip(page * size)
+                .limit(size)
+                .toArray();
             res.send(result);
         })
 
